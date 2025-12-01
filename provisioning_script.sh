@@ -31,9 +31,13 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM}
 echo "Activating zsh-autosuggestions and zsh-syntax-highlighting..."
 sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/g' /root/.zshrc
 
+# --- 4. Install Task ---
+echo "--- 4. Installing Task ---"
+curl -1sLf 'https://dl.cloudsmith.io/public/task/task/setup.deb.sh' | sudo -E bash
+apt install task
 
-# --- 4. Configure VS Code Terminal ---
-echo "--- 4. Configuring VS Code Terminal Settings ---"
+# --- 5. Configure VS Code Terminal ---
+echo "--- 5. Configuring VS Code Terminal Settings ---"
 # Define the target path (VS Code remote settings file)
 VSCODE_SETTINGS_PATH="/root/.vscode-server/data/Machine/settings.json"
 VSCODE_SETTINGS_DIR=$(dirname "$VSCODE_SETTINGS_PATH")
