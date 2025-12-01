@@ -2,17 +2,39 @@
 set -eo pipefail
 
 # --- 1. Install Zsh and Dependencies ---
+echo "--- 1. Installing Zsh and Dependencies (zsh, git, curl, nano, jq) ---"
 apt-get update
-apt-get install -y zsh git curl nano jq # <-- Added jq here
+apt-get install -y zsh git curl nano jq
 
 # --- 2. Install Oh My Zsh ---
+echo "--- 2. Installing Oh My Zsh ---"
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 # Optional: Set Zsh as default shell (requires re-login)
 chsh -s $(which zsh)
 
-# --- 3. Configure VS Code Terminal ---
-# Define the target path (ensure it's correct for your user, usually /root)
+# --- 3. Install and Configure Zsh Plugins ---
+echo "--- 3. Installing Zsh Plugins ---"
+ZSH_CUSTOM="/root/.oh-my-zsh/custom"
+
+# Clone zsh-autosuggestions
+echo "Cloning zsh-autosuggestions..."
+git clone https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM}/plugins/zsh-autosuggestions
+
+# Clone zsh-syntax-highlighting
+echo "Cloning zsh-syntax-highlighting..."
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting
+
+# Activate the plugins in the .zshrc file
+# This sed command finds the plugins line (e.g., plugins=(git)) and replaces it 
+# with the git, autosuggestions, and syntax-highlighting plugins.
+echo "Activating zsh-autosuggestions and zsh-syntax-highlighting..."
+sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/g' /root/.zshrc
+
+
+# --- 4. Configure VS Code Terminal ---
+echo "--- 4. Configuring VS Code Terminal Settings ---"
+# Define the target path (VS Code remote settings file)
 VSCODE_SETTINGS_PATH="/root/.vscode-server/data/Machine/settings.json"
 VSCODE_SETTINGS_DIR=$(dirname "$VSCODE_SETTINGS_PATH")
 
@@ -24,9 +46,7 @@ if [ ! -f "$VSCODE_SETTINGS_PATH" ]; then
     echo "{}" > "$VSCODE_SETTINGS_PATH"
 fi
 
-# Define the JSON configuration fragment
-# NOTE: The keys must be merged into the existing settings object, not the whole block.
-# We are only defining the keys we need to add/update.
+# Define the JSON configuration fragment for zsh login shell
 VSCODE_CONFIG_FRAGMENT='
 {
     "terminal.integrated.profiles.linux": {
@@ -40,12 +60,9 @@ VSCODE_CONFIG_FRAGMENT='
 '
 
 # Use jq to merge the fragment into the existing settings.json file
-# Note: The 'input' here is the existing file content, and the 'update' 
-# is the fragment defined above. jq handles the merging cleanly.
 echo "$VSCODE_CONFIG_FRAGMENT" | jq -s '.[0] * .[1]' "$VSCODE_SETTINGS_PATH" - > temp.json && mv temp.json "$VSCODE_SETTINGS_PATH"
-
 
 echo "Zsh and VS Code settings configured successfully!"
 
-# Cleanup packages (optional)
-# rm -rf /var/lib/apt/lists/*
+# Cleanup packages (optional but recommended)
+rm -rf /var/lib/apt/lists/*
