@@ -21,7 +21,7 @@ class ObjectMask:
 	def area(self) -> int:
 		return np.sum(self.mask)
 
-	def is_overlapping(self, other: 'ObjectMask', padding: int = 2) -> bool:
+	def is_overlapping(self, other: 'ObjectMask', padding: int = 10) -> bool:
 		padded_self = self.mask
 		padded_other = other.mask
 
@@ -43,3 +43,24 @@ class ObjectMaskWithDepth(ObjectMask):
 			raise TypeError("depth must be a numpy ndarray")
 		if self.depth.shape != self.mask.shape:
 			raise ValueError("depth must have the same shape as mask")
+	
+	def is_deeper(self, other: 'ObjectMaskWithDepth', padding: int = 10) -> bool:
+		padded_self = self.mask
+		padded_other = other.mask
+
+		if padding > 0:
+			padded_self = scipy.ndimage.maximum_filter(padded_self, padding)
+			padded_other = scipy.ndimage.maximum_filter(padded_other, padding)
+		
+		overlap = np.logical_and(padded_self, padded_other)
+		if np.any(overlap):
+			filtered_self = overlap * padded_self
+			filtered_other = overlap * padded_other
+			
+			self_overlap_depth = np.nonzero(filtered_self).mean()
+			other_overlap_depth = np.nonzero(filtered_other).mean()
+			return self_overlap_depth < other_overlap_depth
+		else:
+			self_depth = padded_self.mean()
+			other_depth = padded_other.mean()
+			return self_depth < other_depth
