@@ -22,9 +22,12 @@ class ObjectMask:
 		return np.sum(self.mask)
 
 	def is_overlapping(self, other: 'ObjectMask', padding: int = 2) -> bool:
-		# Create padded masks
-		padded_self = scipy.ndimage.binary_dilation(self.mask, iterations=padding)
-		padded_other = scipy.ndimage.binary_dilation(other.mask, iterations=padding)
+		padded_self = self.mask
+		padded_other = other.mask
+
+		if padding > 0:
+			padded_self = scipy.ndimage.binary_dilation(self.mask, iterations=padding)
+			padded_other = scipy.ndimage.binary_dilation(other.mask, iterations=padding)
 		
 		# Calculate overlap
 		overlap = np.logical_and(padded_self, padded_other)
