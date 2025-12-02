@@ -4,3 +4,4 @@ ipykernel
 ipywidgets
 widgetsnbextension
 matplotlib
+scipy
