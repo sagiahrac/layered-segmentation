@@ -44,6 +44,10 @@ class ObjectMaskWithDepth(ObjectMask):
 		if self.full_depth_map.shape != self.mask.shape:
 			raise ValueError("depth must have the same shape as mask")
 	
+	@classmethod
+	def from_objectmask(cls, object_mask: ObjectMask, full_depth_map: np.ndarray) -> 'ObjectMaskWithDepth':
+		return cls(label=object_mask.label, mask=object_mask.mask, full_depth_map=full_depth_map)
+	
 	@property
 	def masked_depth_map(self) -> np.ndarray:
 		return self.full_depth_map * self.mask
