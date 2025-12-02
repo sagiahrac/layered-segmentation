@@ -48,9 +48,9 @@ class ObjectMaskWithDepth(ObjectMask):
 	def masked_depth_map(self) -> np.ndarray:
 		return self.full_depth_map * self.mask
 	
-	def is_deeper(self, other: 'ObjectMaskWithDepth', padding: int = 10) -> bool:
-		padded_self = self.mask
-		padded_other = other.mask
+	def is_deeper_than(self, other: 'ObjectMaskWithDepth', padding: int = 10) -> bool:
+		padded_self = self.masked_depth_map
+		padded_other = other.masked_depth_map
 
 		if padding > 0:
 			padded_self = scipy.ndimage.maximum_filter(padded_self, padding)
@@ -58,11 +58,11 @@ class ObjectMaskWithDepth(ObjectMask):
 		
 		overlap = np.logical_and(padded_self, padded_other)
 		if np.any(overlap):
-			filtered_self = overlap * padded_self
-			filtered_other = overlap * padded_other
+			filtered_self = padded_self[overlap]
+			filtered_other = padded_other[overlap]
 			
-			self_overlap_depth = np.nonzero(filtered_self).mean()
-			other_overlap_depth = np.nonzero(filtered_other).mean()
+			self_overlap_depth = filtered_self.mean()
+			other_overlap_depth = filtered_other.mean()
 			return self_overlap_depth < other_overlap_depth
 		else:
 			self_depth = padded_self.mean()
