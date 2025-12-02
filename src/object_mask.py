@@ -29,3 +29,14 @@ class ObjectMask:
 		# Calculate overlap
 		overlap = np.logical_and(padded_self, padded_other)
 		return np.any(overlap)
+
+@dataclass
+class ObjectMaskWithDepth(ObjectMask):
+	depth: np.ndarray
+
+	def __post_init__(self):
+		super().__post_init__()
+		if not isinstance(self.depth, np.ndarray):
+			raise TypeError("depth must be a numpy ndarray")
+		if self.depth.shape != self.mask.shape:
+			raise ValueError("depth must have the same shape as mask")
