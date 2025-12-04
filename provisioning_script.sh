@@ -68,5 +68,17 @@ echo "$VSCODE_CONFIG_FRAGMENT" | jq -s '.[0] * .[1]' "$VSCODE_SETTINGS_PATH" - >
 
 echo "Zsh and VS Code settings configured successfully!"
 
+# --- 6. Clone Repository ---
+echo "--- 6. Cloning layered-segmentation repository ---"
+cd /workspace
+git clone https://github.com/sagiahrac/layered-segmentation.git
+
+# --- 7. Create env ---
+cd /workspace/layered-segmentation
+task create-venv
+
+# --- 8. Install VSCode Extensions ---
+code --install-extension ms-python.python
+
 # Cleanup packages (optional but recommended)
 rm -rf /var/lib/apt/lists/*
