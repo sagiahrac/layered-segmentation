@@ -78,9 +78,5 @@ echo "7. Creating virtual environment using Task..."
 cd /workspace/layered-segmentation
 task create-venv
 
-# --- 8. Install VSCode Extensions ---
-echo "--- 8. Installing VSCode Extensions ---"
-code --install-extension ms-python.python
-
 # Cleanup packages (optional but recommended)
 rm -rf /var/lib/apt/lists/*
