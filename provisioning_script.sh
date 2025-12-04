@@ -74,10 +74,12 @@ cd /workspace
 git clone https://github.com/sagiahrac/layered-segmentation.git
 
 # --- 7. Create env ---
+echo "7. Creating virtual environment using Task..."
 cd /workspace/layered-segmentation
 task create-venv
 
 # --- 8. Install VSCode Extensions ---
+echo "--- 8. Installing VSCode Extensions ---"
 code --install-extension ms-python.python
 
 # Cleanup packages (optional but recommended)
